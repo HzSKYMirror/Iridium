@@ -92,6 +92,8 @@ def do_calc(server: PluginServerInterface, src: CommandSource, context: dict) ->
 		return
 
 	out = _format_result(result)
+	who = src.get_info().player if src.is_player else "console"
+	server.logger.info(f"[Iridium] !!c: {who} {expression} = {out}")
 	# Private reply to avoid flooding public chat
 	src.reply(
 		RTextList(

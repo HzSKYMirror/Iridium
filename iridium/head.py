@@ -40,6 +40,7 @@ def do_head(server: PluginServerInterface, src: CommandSource, context: dict) ->
 
 	safe_execute(server, _give_head_command(player, safe_target, version))
 	mark_cooldown(player, "head")
+	server.logger.info(f"[Iridium] !!head: {player} -> head of {safe_target}")
 	src.reply(RText(tr("head_success", safe_target), RColor.green))
 
 

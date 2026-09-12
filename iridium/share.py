@@ -118,6 +118,7 @@ def _send_share(
 	safe_execute(server, _build_tellraw(player, item_snbt, version))
 	if config.share_sound:
 		safe_execute(server, _sound_command(version))
+	server.logger.info(f"[Iridium] !!share: {player} shared an item ({len(item_snbt)} chars)")
 	src.reply(RText(tr("share_done"), RColor.green))
 	return True
 

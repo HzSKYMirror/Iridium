@@ -329,6 +329,7 @@ def do_hat(server: PluginServerInterface, src: CommandSource) -> None:
 
 	if _do_swap(server, src, player, version):
 		mark_cooldown(player, "hat")
+		server.logger.info(f"[Iridium] !!hat: {player} swapped hand/head gear")
 
 
 def register(server: PluginServerInterface) -> None:
