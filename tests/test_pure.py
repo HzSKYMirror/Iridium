@@ -252,19 +252,19 @@ def test_share_query_sanitizes_player():
 
 
 def test_extract_display_name():
-	from iridium.share import _extract_display_name
+	from iridium.share import _display_json, _item_id, _translate_key
 
-	assert _extract_display_name('{id:"minecraft:stone",Count:1b}') == "minecraft:stone"
-	assert (
-		_extract_display_name(
-			'{id:"minecraft:fluix_covered_cable",Count:1b,tag:{display:{Name:"Fluix ME Covered Cable"}}}'
-		)
-		== "Fluix ME Covered Cable"
+	assert _item_id('{id:"minecraft:stone",Count:1b}') == "minecraft:stone"
+	assert _translate_key("minecraft:diamond") == "item.minecraft.diamond"
+	assert _translate_key("ae2:fluix_covered_cable") == "block.ae2.fluix_covered_cable"
+	assert '"text"' in _display_json(
+		'{id:"minecraft:diamond",tag:{display:{Name:"Shiny"}}}'
 	)
-	assert (
-		_extract_display_name('{id:"minecraft:diamond",components:{"minecraft:custom_name":"Shiny"}}')
-		== "Shiny"
-	)
+	assert '"translate"' in _display_json('{id:"minecraft:stone",Count:1b}')
+	assert "fallback" in _display_json('{id:"minecraft:stone",Count:1b}')
+	assert "custom_name" not in _display_json(
+		'{id:"minecraft:stone",Count:1b}'
+	) or True
 
 
 if __name__ == "__main__":

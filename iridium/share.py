@@ -44,10 +44,15 @@ def _query_command(player: str, version: Version) -> str:
 	return f"entitydata {name} {{}}"
 
 
-def _sound_command(version: Version) -> str:
+def _sound_command(player: str, version: Version) -> str:
+	name = sanitize_name(player)
+	# Play at the player so @a nearby can hear; default command origin is often too far
 	if is_at_least(version, "1.9"):
-		return "playsound minecraft:entity.arrow.hit_player master @a"
-	return "playsound random.successful_hit @a"
+		return (
+			f"execute at {name} run playsound minecraft:entity.arrow.hit_player "
+			f"master @a ~ ~ ~ 64 1"
+		)
+	return f"execute at {name} run playsound random.successful_hit @a ~ ~ ~ 64 1"
 
 
 def _is_air(snbt: Optional[str]) -> bool:
@@ -63,29 +68,48 @@ def _json_str(value: str) -> str:
 	return json.dumps(value, ensure_ascii=False)[1:-1]
 
 
-def _extract_display_name(item_snbt: str) -> str:
-	"""Best-effort human-readable name from item SNBT."""
-	# JSON text component: "text":"Name"
+def _item_id(item_snbt: str) -> str:
+	m = re.search(r'id\s*:\s*"([^"]+)"', item_snbt)
+	return m.group(1) if m else "?"
+
+
+def _extract_custom_name(item_snbt: str) -> Optional[str]:
+	"""Only names stored in NBT (player rename / anvil). Registry names are not here."""
 	m = re.search(r'"text"\s*:\s*"([^"]+)"', item_snbt)
 	if m and m.group(1).strip():
 		return _strip_mc_codes(m.group(1).strip())
-	# display.Name / custom_name as plain string (SNBT quoted key or bare key)
 	m = re.search(r'["\']?(?:Name|custom_name)["\']?\s*:\s*"([^"]+)"', item_snbt)
 	if m and m.group(1).strip():
 		return _strip_mc_codes(m.group(1).strip())
 	m = re.search(r"['\"]?(?:Name|custom_name)['\"]?\s*:\s*'([^']+)'", item_snbt)
 	if m and m.group(1).strip():
 		return _strip_mc_codes(m.group(1).strip())
-	# translation key fallback (e.g. block.ae2.fluix_covered_cable)
-	m = re.search(r'"translate"\s*:\s*"([^"]+)"', item_snbt)
-	if m and m.group(1).strip():
-		key = m.group(1).strip()
-		short = key.rsplit(".", 1)[-1]
-		return short.replace("_", " ")
-	id_match = re.search(r'id\s*:\s*"([^"]+)"', item_snbt)
-	if id_match:
-		return id_match.group(1)
-	return "?"
+	return None
+
+
+def _translate_key(item_id: str) -> str:
+	"""Guess client language key from item id (best-effort)."""
+	if ":" not in item_id:
+		return f"item.minecraft.{item_id}"
+	ns, path = item_id.split(":", 1)
+	if ns == "minecraft":
+		# Most block-items use block.minecraft.*; tools/items use item.minecraft.*
+		# Prefer item.* — missing key falls back via "fallback"
+		return f"item.minecraft.{path}"
+	# Modded cables/blocks: block.<mod>.<path>
+	return f"block.{ns}.{path}"
+
+
+def _display_json(item_snbt: str) -> str:
+	"""JSON text component: custom name if any, else client-side translate key."""
+	custom = _extract_custom_name(item_snbt)
+	if custom:
+		return '{"text":"' + _json_str(custom) + '"}'
+	item_id = _item_id(item_snbt)
+	key = _translate_key(item_id)
+	return (
+		'{"translate":"' + _json_str(key) + '","fallback":"' + _json_str(item_id) + '"}'
+	)
 
 
 def _strip_mc_codes(text: str) -> str:
@@ -100,35 +124,43 @@ def _build_tellraw(player: str, item_snbt: str, version: Version) -> str:
 	player_js = _json_str(sanitize_name(player) or player)
 
 	if is_at_least(version, "1.21.5"):
-		hover = '{"action":"show_item","contents":"' + snbt + '"}'
+		hover = {"action": "show_item", "contents": item_snbt}
 	else:
-		hover = '{"action":"show_item","value":"' + snbt + '"}'
+		hover = {"action": "show_item", "value": item_snbt}
 
 	if is_at_least(version, "1.16"):
-		click = '{"action":"copy_to_clipboard","value":"' + snbt + '"}'
-		click_label = _json_str(tr("click_copy"))
+		click = {"action": "copy_to_clipboard", "value": item_snbt}
+		click_label = tr("click_copy")
 	else:
-		# pre-1.16 has no copy_to_clipboard; suggest the version-appropriate query cmd
 		safe_player = sanitize_name(player)
 		if is_at_least(version, "1.13"):
 			suggest = f"/data get entity {safe_player} SelectedItem"
 		else:
 			suggest = f"/entitydata {safe_player} {{}}"
-		click = '{"action":"suggest_command","value":"' + _json_str(suggest) + '"}'
-		click_label = _json_str(tr("click_suggest"))
+		click = {"action": "suggest_command", "value": suggest}
+		click_label = tr("click_suggest")
 
-	display = _extract_display_name(item_snbt)
-	display_js = _json_str(display)
+	display = json.loads(_display_json(item_snbt))
+	display["color"] = "aqua"
+	display["hoverEvent"] = hover
 
-	json_text = (
-		'[{"text":"[Iridium] ","color":"gray"},'
-		'{"text":"' + player_js + '","color":"yellow"},'
-		'{"text":" ' + _json_str(tr("share_showing")) + ' "},'
-		'{"text":"' + display_js + '","color":"aqua","hoverEvent":' + hover + "},"
-		'{"text":" [' + click_label + ']","color":"aqua","bold":true,'
-		'"underlined":true,"hoverEvent":' + hover + ',"clickEvent":' + click + "}]"
-	)
-	return f"tellraw @a {json_text}"
+	click_comp = {
+		"text": f" [{click_label}]",
+		"color": "aqua",
+		"bold": True,
+		"underlined": True,
+		"hoverEvent": hover,
+		"clickEvent": click,
+	}
+
+	payload = [
+		{"text": "[Iridium] ", "color": "gray"},
+		{"text": sanitize_name(player) or player, "color": "yellow"},
+		{"text": f" {tr('share_showing')} "},
+		display,
+		click_comp,
+	]
+	return "tellraw @a " + json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
 
 
 def _send_share(
@@ -143,8 +175,11 @@ def _send_share(
 		return False
 	safe_execute(server, _build_tellraw(player, item_snbt, version))
 	if config.share_sound:
-		safe_execute(server, _sound_command(version))
-	server.logger.info(f"[Iridium] !!share: {player} shared an item ({len(item_snbt)} chars)")
+		safe_execute(server, _sound_command(player, version))
+	server.logger.info(
+		f"[Iridium] !!share: {player} shared item id={_item_id(item_snbt)} "
+		f"({len(item_snbt)} chars)"
+	)
 	src.reply(RText(tr("share_done"), RColor.green))
 	return True
 

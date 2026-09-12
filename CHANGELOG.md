@@ -2,6 +2,12 @@
 
 本文件记录 Iridium 的重要变更。
 
+## [26.9.6] - 2026-09-13
+
+### Fixed
+- `!!share`：默认物品名改为客户端 `translate` 组件（如 `block.ae2.fluix_covered_cable`），本地化显示正式名；仅有 NBT 自定义名时仍显示改名
+- `!!share`：提示音在玩家位置播放，避免 "sound is too far away"
+
 ## [26.9.5] - 2026-09-13
 
 ### Fixed
