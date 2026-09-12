@@ -227,6 +227,18 @@ def test_sanitize_name_and_cmd():
 	assert sanitize_cmd("a\r\nb") == "a  b"
 
 
+def test_is_at_least_accepts_str():
+	from mcdreforged.api.all import Version
+
+	from iridium.version_util import is_at_least
+
+	assert is_at_least(Version("1.20.1"), "1.8") is True
+	assert is_at_least("1.20.1", "1.8") is True
+	assert is_at_least("1.7.10", "1.13") is False
+	assert is_at_least("1.12.2", "1.13") is False
+	assert is_at_least("not-a-version", "1.8") is False
+
+
 def test_share_query_sanitizes_player():
 	from mcdreforged.api.all import Version
 

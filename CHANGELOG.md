@@ -2,6 +2,12 @@
 
 本文件记录 Iridium 的重要变更。
 
+## [26.9.3] - 2026-09-13
+
+### Fixed
+- `!!share` / `!!hat` / `!!head`：`info.version` 若为字符串时比较崩溃（`Cannot compare Version and str`）
+- `!!c`：命令回调少绑定 `server` 导致 `do_calc() missing ... context`
+
 ## [26.9.2] - 2026-09-13
 
 ### Fixed

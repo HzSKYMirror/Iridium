@@ -26,17 +26,28 @@ def tr(key: str, *args) -> str:
 	return si.tr(f"iridium.{key}", *args)
 
 
+def _as_version(value) -> Optional[Version]:
+	if value is None:
+		return None
+	if isinstance(value, Version):
+		return value
+	try:
+		return Version(str(value))
+	except Exception:
+		return None
+
+
 def get_mc_version(server: PluginServerInterface) -> Optional[Version]:
 	"""Return the detected Minecraft server version, or None."""
 	if config.force_version:
-		try:
-			return Version(config.force_version)
-		except Exception:
-			server.logger.warning(tr("bad_force_version", config.force_version))
+		forced = _as_version(config.force_version)
+		if forced is not None:
+			return forced
+		server.logger.warning(tr("bad_force_version", config.force_version))
 	info = server.get_server_information()
-	if info is None or info.version is None:
+	if info is None:
 		return None
-	return info.version
+	return _as_version(info.version)
 
 
 def require_version(server: PluginServerInterface, src: CommandSource) -> Optional[Version]:
@@ -46,5 +57,9 @@ def require_version(server: PluginServerInterface, src: CommandSource) -> Option
 	return version
 
 
-def is_at_least(version: Version, target: str) -> bool:
-	return version >= Version(target)
+def is_at_least(version, target: str) -> bool:
+	left = _as_version(version)
+	right = _as_version(target)
+	if left is None or right is None:
+		return False
+	return left >= right

@@ -106,7 +106,7 @@ def do_calc(server: PluginServerInterface, src: CommandSource, context: dict) ->
 def register(server: PluginServerInterface) -> None:
 	builder = SimpleCommandBuilder()
 	builder.command("!!c", lambda src: src.reply(RText(tr("calc_usage"), RColor.yellow)))
-	builder.command("!!c <expression>", do_calc)
+	builder.command("!!c <expression>", lambda src, ctx: do_calc(server, src, ctx))
 	builder.arg("expression", GreedyText)
 	builder.register(server)
 	server.register_help_message("!!c <expression>", tr("calc_help"))
