@@ -239,4 +239,5 @@ def on_player_joined(server: PluginServerInterface, player: str, info: Info) -> 
 
 
 def register(server: PluginServerInterface) -> None:
-	server.register_event_listener(MCDRPluginEvents.PLAYER_JOIN, on_player_joined)
+	# MCDR event name is PLAYER_JOINED (not PLAYER_JOIN)
+	server.register_event_listener(MCDRPluginEvents.PLAYER_JOINED, on_player_joined)

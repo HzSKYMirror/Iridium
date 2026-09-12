@@ -2,6 +2,12 @@
 
 本文件记录 Iridium 的重要变更。
 
+## [26.9.2] - 2026-09-13
+
+### Fixed
+- 语言文件 YAML 解析失败（值中含 `:` 未加引号导致 `mapping values are not allowed`）
+- 进服事件名错误：`PLAYER_JOIN` → `PLAYER_JOINED`（否则插件 on_load 失败）
+
 ## [26.9.1] - 2026-09-13
 
 ### Added
