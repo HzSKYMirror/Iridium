@@ -3,10 +3,10 @@
 	"authors": [
 		{
 			"name": "云镜之端/SKYMirror",
-			"link": "https://git.skymirror.top/SKYMirrorPublicTeam"
+			"link": "https://github.com/HzSKYMirror"
 		}
 	],
-	"repository": "https://github.com/REPLACE_ME/Iridium",
+	"repository": "https://github.com/HzSKYMirror/Iridium",
 	"branch": "main",
 	"related_path": ".",
 	"labels": ["tool"],
