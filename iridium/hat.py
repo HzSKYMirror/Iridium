@@ -258,52 +258,64 @@ def _extract_item_payload(payload: str, version: Version) -> Optional[str]:
 
 
 def _do_swap(server: PluginServerInterface, src: CommandSource, player: str, version: Version) -> bool:
-	if not is_at_least(version, "1.13"):
-		# Single entitydata dump contains both SelectedItem and head Inventory slot
-		dump = rcon_query(server, _entitydata_query(player))
-		if dump is None:
-			src.reply(RText(tr("hat_query_failed"), RColor.red))
-			return False
-		hotbar_index = _extract_selected_slot(dump)
-		hand = _extract_item_payload(dump, version)
-		if hand is None or _is_air(hand):
-			src.reply(RText(tr("hand_is_empty"), RColor.red))
-			return False
-		head = _extract_head_item(dump, version)
-	else:
+	name = sanitize_name(player)
+	head_slot = _head_slot(version)
+	hand_slot = _hand_slot(version, 0)
+
+	# 1.17+: true swap via offhand buffer — no need to rebuild item NBT
+	if is_at_least(version, "1.17"):
 		hand_raw = rcon_query(server, _selected_query(player, version))
 		if hand_raw is None:
 			src.reply(RText(tr("hat_query_failed"), RColor.red))
 			return False
-		hotbar_index = 0
 		hand = _extract_item_payload(hand_raw, version)
 		if hand is None or _is_air(hand):
 			src.reply(RText(tr("hand_is_empty"), RColor.red))
 			return False
-		head = None
-		head_raw = rcon_query(server, _head_query(player, version))
-		if head_raw is not None:
-			head = _extract_head_item(head_raw, version)
 
-	head_slot = _head_slot(version)
-	hand_slot = _hand_slot(version, hotbar_index)
-	name = sanitize_name(player)
+		off_raw = rcon_query(server, f"data get entity {name} weapon.offhand")
+		off = None
+		if off_raw is not None:
+			off = _extract_item_payload(off_raw, version)
+		if off and not _is_air(off):
+			src.reply(RText(tr("hat_offhand_busy"), RColor.red))
+			return False
 
-	if is_at_least(version, "1.17"):
+		# 1) save head -> offhand  2) hand -> head  3) offhand -> hand  4) clear offhand
+		safe_execute(
+			server,
+			f"item replace entity {name} weapon.offhand from entity {name} {head_slot}",
+		)
 		safe_execute(
 			server,
 			f"item replace entity {name} {head_slot} from entity {name} weapon.mainhand",
 		)
-		if head and not _is_air(head):
-			safe_execute(server, _replace_with(player, hand_slot, head, version))
-		else:
-			safe_execute(server, f"item replace entity {name} {hand_slot} with air")
+		safe_execute(
+			server,
+			f"item replace entity {name} weapon.mainhand from entity {name} weapon.offhand",
+		)
+		safe_execute(server, f"item replace entity {name} weapon.offhand with air")
+		src.reply(RText(tr("hat_success"), RColor.green))
+		return True
+
+	# 1.8–1.16: rebuild via parsed SNBT
+	dump = rcon_query(server, _entitydata_query(player))
+	if dump is None:
+		src.reply(RText(tr("hat_query_failed"), RColor.red))
+		return False
+	hotbar_index = _extract_selected_slot(dump)
+	hand_slot = _hand_slot(version, hotbar_index)
+	hand = _extract_item_payload(dump, version)
+	if hand is None or _is_air(hand):
+		src.reply(RText(tr("hand_is_empty"), RColor.red))
+		return False
+	head = _extract_head_item(dump, version)
+
+	safe_execute(server, _replace_with(player, head_slot, hand, version))
+	if head and not _is_air(head):
+		safe_execute(server, _replace_with(player, hand_slot, head, version))
 	else:
-		safe_execute(server, _replace_with(player, head_slot, hand, version))
-		if head and not _is_air(head):
-			safe_execute(server, _replace_with(player, hand_slot, head, version))
-		else:
-			safe_execute(server, _replace_with(player, hand_slot, "minecraft:air", version))
+		safe_execute(server, _replace_with(player, hand_slot, "minecraft:air", version))
 
 	src.reply(RText(tr("hat_success"), RColor.green))
 	return True

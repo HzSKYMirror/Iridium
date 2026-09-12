@@ -63,6 +63,35 @@ def _json_str(value: str) -> str:
 	return json.dumps(value, ensure_ascii=False)[1:-1]
 
 
+def _extract_display_name(item_snbt: str) -> str:
+	"""Best-effort human-readable name from item SNBT."""
+	# JSON text component: "text":"Name"
+	m = re.search(r'"text"\s*:\s*"([^"]+)"', item_snbt)
+	if m and m.group(1).strip():
+		return _strip_mc_codes(m.group(1).strip())
+	# display.Name / custom_name as plain string
+	m = re.search(r'(?:Name|custom_name)\s*:\s*"([^"]+)"', item_snbt)
+	if m and m.group(1).strip():
+		return _strip_mc_codes(m.group(1).strip())
+	m = re.search(r"(?:Name|custom_name)\s*:\s*'([^']+)'", item_snbt)
+	if m and m.group(1).strip():
+		return _strip_mc_codes(m.group(1).strip())
+	# translation key fallback (e.g. block.ae2.fluix_covered_cable)
+	m = re.search(r'"translate"\s*:\s*"([^"]+)"', item_snbt)
+	if m and m.group(1).strip():
+		key = m.group(1).strip()
+		short = key.rsplit(".", 1)[-1]
+		return short.replace("_", " ")
+	id_match = re.search(r'id\s*:\s*"([^"]+)"', item_snbt)
+	if id_match:
+		return id_match.group(1)
+	return "?"
+
+
+def _strip_mc_codes(text: str) -> str:
+	return re.sub(r"§[0-9a-fk-orA-FK-OR]", "", text)
+
+
 def _build_tellraw(player: str, item_snbt: str, version: Version) -> str:
 	# Truncate pathological NBT (huge books etc.) so the command stays valid
 	if len(item_snbt) > MAX_SNBT_LEN:
@@ -88,10 +117,7 @@ def _build_tellraw(player: str, item_snbt: str, version: Version) -> str:
 		click = '{"action":"suggest_command","value":"' + _json_str(suggest) + '"}'
 		click_label = _json_str(tr("click_suggest"))
 
-	id_match = re.search(r'id\s*:\s*"([^"]+)"', item_snbt)
-	item_id = id_match.group(1) if id_match else "?"
-	name_match = re.search(r'"text"\s*:\s*"([^"]+)"', item_snbt)
-	display = name_match.group(1) if name_match else item_id
+	display = _extract_display_name(item_snbt)
 	display_js = _json_str(display)
 
 	json_text = (
