@@ -1,0 +1,17 @@
+{
+	"id": "iridium",
+	"authors": [
+		{
+			"name": "云镜之端/SKYMirror",
+			"link": "https://git.skymirror.top/SKYMirrorPublicTeam"
+		}
+	],
+	"repository": "https://github.com/REPLACE_ME/Iridium",
+	"branch": "main",
+	"related_path": ".",
+	"labels": ["tool"],
+	"introduction": {
+		"zh_cn": "README.md",
+		"en_us": "README.md"
+	}
+}
