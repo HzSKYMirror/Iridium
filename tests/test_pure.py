@@ -252,19 +252,19 @@ def test_share_query_sanitizes_player():
 
 
 def test_extract_display_name():
-	from iridium.share import _display_json, _item_id, _translate_key
+	from iridium.share import _display_json, _humanize_id, _item_id, _translate_key
 
 	assert _item_id('{id:"minecraft:stone",Count:1b}') == "minecraft:stone"
 	assert _translate_key("minecraft:diamond") == "item.minecraft.diamond"
-	assert _translate_key("ae2:fluix_covered_cable") == "block.ae2.fluix_covered_cable"
-	assert '"text"' in _display_json(
-		'{id:"minecraft:diamond",tag:{display:{Name:"Shiny"}}}'
-	)
-	assert '"translate"' in _display_json('{id:"minecraft:stone",Count:1b}')
-	assert "fallback" in _display_json('{id:"minecraft:stone",Count:1b}')
-	assert "custom_name" not in _display_json(
-		'{id:"minecraft:stone",Count:1b}'
-	) or True
+	assert _translate_key("kubejs:time_twister_wireless") == "item.kubejs.time_twister_wireless"
+	assert _humanize_id("kubejs:time_twister_wireless") == "Time Twister Wireless"
+	assert _humanize_id("minecraft:fluix_covered_cable") == "Fluix Covered Cable"
+	assert '"text"' in _display_json('{id:"minecraft:diamond",tag:{display:{Name:"Shiny"}}}')
+	disp = _display_json('{id:"kubejs:time_twister_wireless",Count:1b}')
+	assert '"translate"' in disp
+	assert "Time Twister Wireless" in disp
+	assert "fallback" in disp
+	assert "kubejs:time_twister_wireless" not in disp
 
 
 if __name__ == "__main__":

@@ -2,6 +2,11 @@
 
 本文件记录 Iridium 的重要变更。
 
+## [26.9.7] - 2026-09-13
+
+### Fixed
+- `!!share`：无 NBT 改名时，正文 fallback 改为 ID 美化名（如 `Time Twister Wireless`），不再直接显示 `kubejs:...`；语言键命中则显示正式本地化名
+
 ## [26.9.6] - 2026-09-13
 
 ### Fixed

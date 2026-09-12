@@ -87,28 +87,35 @@ def _extract_custom_name(item_snbt: str) -> Optional[str]:
 	return None
 
 
+def _humanize_id(item_id: str) -> str:
+	"""kubejs:time_twister_wireless -> Time Twister Wireless"""
+	path = item_id.split(":", 1)[-1]
+	parts = [p for p in path.replace("-", "_").split("_") if p]
+	if not parts:
+		return item_id
+	return " ".join(p[:1].upper() + p[1:] for p in parts)
+
+
 def _translate_key(item_id: str) -> str:
 	"""Guess client language key from item id (best-effort)."""
 	if ":" not in item_id:
 		return f"item.minecraft.{item_id}"
 	ns, path = item_id.split(":", 1)
 	if ns == "minecraft":
-		# Most block-items use block.minecraft.*; tools/items use item.minecraft.*
-		# Prefer item.* — missing key falls back via "fallback"
 		return f"item.minecraft.{path}"
-	# Modded cables/blocks: block.<mod>.<path>
-	return f"block.{ns}.{path}"
+	return f"item.{ns}.{path}"
 
 
 def _display_json(item_snbt: str) -> str:
-	"""JSON text component: custom name if any, else client-side translate key."""
+	"""JSON text component: custom name if any, else client translate + humanized fallback."""
 	custom = _extract_custom_name(item_snbt)
 	if custom:
 		return '{"text":"' + _json_str(custom) + '"}'
 	item_id = _item_id(item_snbt)
 	key = _translate_key(item_id)
+	pretty = _humanize_id(item_id)
 	return (
-		'{"translate":"' + _json_str(key) + '","fallback":"' + _json_str(item_id) + '"}'
+		'{"translate":"' + _json_str(key) + '","fallback":"' + _json_str(pretty) + '"}'
 	)
 
 
