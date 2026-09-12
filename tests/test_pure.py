@@ -267,6 +267,18 @@ def test_extract_display_name():
 	assert "kubejs:time_twister_wireless" not in disp
 
 
+def test_strip_json_comments():
+	import json
+
+	from iridium.config import DEFAULT_CONFIG_TEXT, _strip_json_comments
+
+	parsed = json.loads(_strip_json_comments(DEFAULT_CONFIG_TEXT))
+	assert parsed["permission"] == 1
+	assert "skymirror.top" in parsed["motd_lines"][2]
+	# comment-looking text inside string is kept
+	assert json.loads(_strip_json_comments('{"a": "http://x"}'))["a"] == "http://x"
+
+
 if __name__ == "__main__":
 	fns = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
 	failed = 0

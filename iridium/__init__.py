@@ -10,16 +10,12 @@ import iridium.hat as hat
 import iridium.head as head
 import iridium.join_tip as join_tip
 import iridium.share as share
-from iridium.config import CONFIG_FILE, Config, apply_config
+from iridium.config import Config, apply_config, load_config
 from iridium.version_util import tr
 
 
 def on_load(server: PluginServerInterface, prev_module) -> None:
-	loaded = server.load_config_simple(
-		CONFIG_FILE,
-		target_class=Config,
-		in_data_folder=False,
-	)
+	loaded = load_config(server)
 	apply_config(loaded)
 	server.logger.info(tr("loaded"))
 
