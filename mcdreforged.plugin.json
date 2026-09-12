@@ -1,0 +1,18 @@
+{
+	"id": "iridium",
+	"version": "26.9.1",
+	"name": "Iridium",
+	"description": {
+		"zh_cn": "物品展示 / 戴头 / 获取头颅 / 游戏内计算器 / 进服 MOTD",
+		"en_us": "Item share / hat / player head / calculator / join MOTD"
+	},
+	"author": [
+		"云镜之端/SKYMirror"
+	],
+	"dependencies": {
+		"mcdreforged": ">=2.6.0"
+	},
+	"resources": [
+		"lang"
+	]
+}

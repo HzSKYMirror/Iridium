@@ -1,0 +1,32 @@
+iridium.loaded: Iridium loaded
+iridium.unloaded: Iridium unloaded
+iridium.version_mode: Version detection mode: {0}
+iridium.bad_force_version: Invalid force_version in config: {0}
+iridium.version_unknown: Unable to detect Minecraft version. Wait for VersionDetector, or set force_version in config
+iridium.player_only: This command can only be used by a player in-game
+iridium.required_permission: Insufficient permission, requires level {0}
+iridium.on_cooldown: Cooldown, wait {0}s
+iridium.hand_is_empty: No usable item in hand
+iridium.share_help: Show the item in your main hand (hover to view)
+iridium.share_done: Item shared to chat
+iridium.share_unsupported_version: Version {0} cannot read held item (needs Minecraft 1.8+)
+iridium.share_timeout: Timed out reading held item, try again later
+iridium.click_copy: click to copy data
+iridium.click_suggest: click for data command
+iridium.share_showing: is showing
+iridium.hat_help: Swap the item in your hand with your head slot
+iridium.hat_success: Swapped hand item with head equipment
+iridium.hat_unsupported_version: Version {0} does not support !!hat (needs Minecraft 1.8+)
+iridium.hat_need_rcon: !!hat requires RCON enabled to read and swap item data
+iridium.hat_query_failed: Failed to query player item data
+iridium.head_help: Get one player head (optional player name, cooldown {0}s)
+iridium.head_help_short: Get one player head (optional player name)
+iridium.head_success: You received a head of {0}
+iridium.calc_help: Evaluate an expression, e.g. !!c 1+2*(3-1)
+iridium.calc_usage: Usage: !!c <expression>, e.g. !!c 1+2*(3-1)
+iridium.calc_error: Cannot calculate {0}: {1}
+iridium.calc_div_zero: Division by zero
+iridium.join_tip_header: Iridium is enabled. Available commands: (click to fill chat)
+iridium.join_tip_click: click to fill chat
+iridium.motd_header: Server Info
+iridium.motd_days: Day {0} since server start

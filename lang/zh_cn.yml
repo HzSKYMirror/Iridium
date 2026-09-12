@@ -1,0 +1,32 @@
+iridium.loaded: Iridium 已加载
+iridium.unloaded: Iridium 已卸载
+iridium.version_mode: 版本检测模式: {0}
+iridium.bad_force_version: 配置 force_version 无效: {0}
+iridium.version_unknown: 无法检测 Minecraft 版本，请等待服务器完成 VersionDetector，或在配置中设置 force_version
+iridium.player_only: 该命令只能由玩家在游戏内使用
+iridium.required_permission: 权限不足，需要权限等级 {0}
+iridium.on_cooldown: 冷却中，请再等待 {0} 秒
+iridium.hand_is_empty: 手上没有可处理的物品
+iridium.share_help: 展示手上物品的完整信息（悬停查看）
+iridium.share_done: 已在聊天栏展示物品
+iridium.share_unsupported_version: 当前版本 {0} 无法读取手持物品（需要 Minecraft 1.8+）
+iridium.share_timeout: 读取手持物品超时，请稍后再试
+iridium.click_copy: 点击复制完整数据
+iridium.click_suggest: 点击获取完整数据命令
+iridium.share_showing: 正在展示
+iridium.hat_help: 将手上物品与头部装备互换
+iridium.hat_success: 已交换手上物品与头部装备
+iridium.hat_unsupported_version: 当前版本 {0} 不支持 !!hat（需要 Minecraft 1.8+）
+iridium.hat_need_rcon: !!hat 需要启用 RCON 才能读取并交换物品数据
+iridium.hat_query_failed: 读取玩家物品数据失败
+iridium.head_help: 获取一个玩家头颅（可指定玩家名，冷却 {0} 秒）
+iridium.head_help_short: 获取一个玩家头颅（可指定玩家名）
+iridium.head_success: 已给予你 {0} 的头颅
+iridium.calc_help: 计算表达式，例如 !!c 1+2*(3-1)
+iridium.calc_usage: 用法: !!c <表达式>，例如 !!c 1+2*(3-1)
+iridium.calc_error: 无法计算 {0}: {1}
+iridium.calc_div_zero: 除数不能为 0
+iridium.join_tip_header: 本服已启用 Iridium，可用命令：（点击命令可填入聊天框）
+iridium.join_tip_click: 点击填入聊天栏
+iridium.motd_header: 服务器信息
+iridium.motd_days: 开服第 {0} 天
