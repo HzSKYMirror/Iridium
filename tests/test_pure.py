@@ -251,6 +251,22 @@ def test_share_query_sanitizes_player():
 	assert "Badname" in tr
 
 
+def test_extract_display_name():
+	from iridium.share import _extract_display_name
+
+	assert _extract_display_name('{id:"minecraft:stone",Count:1b}') == "minecraft:stone"
+	assert (
+		_extract_display_name(
+			'{id:"minecraft:fluix_covered_cable",Count:1b,tag:{display:{Name:"Fluix ME Covered Cable"}}}'
+		)
+		== "Fluix ME Covered Cable"
+	)
+	assert (
+		_extract_display_name('{id:"minecraft:diamond",components:{"minecraft:custom_name":"Shiny"}}')
+		== "Shiny"
+	)
+
+
 if __name__ == "__main__":
 	fns = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
 	failed = 0

@@ -69,11 +69,11 @@ def _extract_display_name(item_snbt: str) -> str:
 	m = re.search(r'"text"\s*:\s*"([^"]+)"', item_snbt)
 	if m and m.group(1).strip():
 		return _strip_mc_codes(m.group(1).strip())
-	# display.Name / custom_name as plain string
-	m = re.search(r'(?:Name|custom_name)\s*:\s*"([^"]+)"', item_snbt)
+	# display.Name / custom_name as plain string (SNBT quoted key or bare key)
+	m = re.search(r'["\']?(?:Name|custom_name)["\']?\s*:\s*"([^"]+)"', item_snbt)
 	if m and m.group(1).strip():
 		return _strip_mc_codes(m.group(1).strip())
-	m = re.search(r"(?:Name|custom_name)\s*:\s*'([^']+)'", item_snbt)
+	m = re.search(r"['\"]?(?:Name|custom_name)['\"]?\s*:\s*'([^']+)'", item_snbt)
 	if m and m.group(1).strip():
 		return _strip_mc_codes(m.group(1).strip())
 	# translation key fallback (e.g. block.ae2.fluix_covered_cable)
