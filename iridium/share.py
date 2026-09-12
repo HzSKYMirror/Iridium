@@ -127,45 +127,21 @@ def _build_tellraw(player: str, item_snbt: str, version: Version) -> str:
 	# Truncate pathological NBT (huge books etc.) so the command stays valid
 	if len(item_snbt) > MAX_SNBT_LEN:
 		item_snbt = item_snbt[:MAX_SNBT_LEN] + "..."
-	snbt = _json_str(item_snbt)
-	player_js = _json_str(sanitize_name(player) or player)
 
 	if is_at_least(version, "1.21.5"):
 		hover = {"action": "show_item", "contents": item_snbt}
 	else:
 		hover = {"action": "show_item", "value": item_snbt}
 
-	if is_at_least(version, "1.16"):
-		click = {"action": "copy_to_clipboard", "value": item_snbt}
-		click_label = tr("click_copy")
-	else:
-		safe_player = sanitize_name(player)
-		if is_at_least(version, "1.13"):
-			suggest = f"/data get entity {safe_player} SelectedItem"
-		else:
-			suggest = f"/entitydata {safe_player} {{}}"
-		click = {"action": "suggest_command", "value": suggest}
-		click_label = tr("click_suggest")
-
 	display = json.loads(_display_json(item_snbt))
 	display["color"] = "aqua"
 	display["hoverEvent"] = hover
-
-	click_comp = {
-		"text": f" [{click_label}]",
-		"color": "aqua",
-		"bold": True,
-		"underlined": True,
-		"hoverEvent": hover,
-		"clickEvent": click,
-	}
 
 	payload = [
 		{"text": "[Iridium] ", "color": "gray"},
 		{"text": sanitize_name(player) or player, "color": "yellow"},
 		{"text": f" {tr('share_showing')} "},
 		display,
-		click_comp,
 	]
 	return "tellraw @a " + json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
 
