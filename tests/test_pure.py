@@ -1,6 +1,7 @@
 """Pure-function unit tests (no live MCDR server required)."""
-import sys
+import json
 import os
+import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -268,18 +269,33 @@ def test_extract_display_name():
 
 
 def test_strip_json_comments():
-	import json
 	from datetime import date
 
-	from iridium.config import build_default_config_text, _strip_json_comments
+	from iridium.config import _strip_json_comments, build_default_config_text
 
-	text = build_default_config_text()
-	parsed = json.loads(_strip_json_comments(text))
-	assert parsed["permission"] == 1
-	assert "skymirror.top" in parsed["motd_lines"][2]
-	assert parsed["motd_start_day"] == date.today().strftime("%Y-%m-%d")
-	# comment-looking text inside string is kept
+	# legacy JSON comment stripper still works
+	assert json.loads(_strip_json_comments('{"a": 1 // x\n}'))["a"] == 1
 	assert json.loads(_strip_json_comments('{"a": "http://x"}'))["a"] == "http://x"
+
+
+def test_default_yaml_config():
+	from datetime import date
+
+	from iridium.config import _load_yaml_text, build_default_config_text
+
+	data = _load_yaml_text(build_default_config_text())
+	assert data["permission"] == 1
+	assert data["motd_start_day"] == date.today().strftime("%Y-%m-%d")
+	assert any("skymirror.top" in line for line in data["motd_lines"])
+	assert any("skymirror.top/qq" in line for line in data["motd_lines"])
+
+
+def test_legacy_json_to_yaml_parse():
+	from iridium.config import _try_load_dict_from_text
+
+	assert _try_load_dict_from_text('{"permission": 2}')["permission"] == 2
+	assert _try_load_dict_from_text('{\n // c\n "permission": 3\n} ')["permission"] == 3
+	assert _try_load_dict_from_text("permission: 4\nmotd_start_day: '2020-01-01'\n")["permission"] == 4
 
 
 if __name__ == "__main__":

@@ -5,6 +5,16 @@ This file records notable changes to Iridium.
 
 ---
 
+## [26.9.16] - 2026-09-14
+
+### 变更 / Changed
+- 配置格式改为 **YAML**：`config/iridium/iridium.yml`（`#` 原生注释）
+- Config format is now **YAML**: `config/iridium/iridium.yml` (native `#` comments)
+- 自动从旧 JSON（`config/iridium.json` 或 `config/iridium/iridium.json`）迁移
+- Auto-migrates from legacy JSON configs
+
+---
+
 ## [26.9.15] - 2026-09-14
 
 ### 修复 / Fixed

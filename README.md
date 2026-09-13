@@ -4,7 +4,7 @@ MCDReforged 插件：物品展示 / 戴头 / 获取头颅 / 游戏内计算器 /
 
 | | |
 |---|---|
-| 版本 | **26.9.15** |
+| 版本 | **26.9.16** |
 | 作者 | 云镜之端/SKYMirror |
 | 许可 | 保留所有权益（All Rights Reserved） |
 | 前置 | MCDReforged `>= 2.6.0` |
@@ -79,26 +79,23 @@ rcon.password=your_password
 
 ## 配置
 
-路径：`config/iridium/iridium.json`（首次加载自动生成；若存在旧文件 `config/iridium.json` 会自动迁移）
+路径：`config/iridium/iridium.yml`（YAML，`#` 注释；首次加载自动生成；旧的 `config/iridium.json` / `config/iridium/iridium.json` 会自动迁移）
 
-```json
-{
-	"permission": 1,
-	"head_cooldown_seconds": 60,
-	"hat_cooldown_seconds": 3,
-	"share_sound": true,
-	"force_version": "",
-	"join_tip": true,
-	"join_tip_delay_seconds": 1.5,
-	"motd_enabled": true,
-	"motd_start_day": "2026-09-14",
-	"motd_lines": [
-		"§6欢迎 §e{player}§6 加入服务器！",
-		"§7服务器已开服 §b{days}§7 天",
-		"§7官网: {link:§b点击打开官网|https://www.skymirror.top}",
-		"§7QQ群: {link:§f985402607|https://skymirror.top/qq}"
-	]
-}
+```yaml
+permission: 1
+head_cooldown_seconds: 60
+hat_cooldown_seconds: 3
+share_sound: true
+force_version: ""
+join_tip: true
+join_tip_delay_seconds: 1.5
+motd_enabled: true
+motd_start_day: "2026-09-14"
+motd_lines:
+  - "§6欢迎 §e{player}§6 加入服务器！"
+  - "§7服务器已开服 §b{days}§7 天"
+  - "§7官网: {link:§b点击打开官网|https://www.skymirror.top}"
+  - "§7QQ群: {link:§f985402607|https://skymirror.top/qq}"
 ```
 
 | 字段 | 默认 | 说明 |
