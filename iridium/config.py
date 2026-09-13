@@ -1,9 +1,13 @@
 import json
-import re
+from datetime import date
 from pathlib import Path
 from typing import List, Optional
 
 from mcdreforged.api.all import *
+
+
+def _today() -> str:
+	return date.today().strftime("%Y-%m-%d")
 
 
 class Config(Serializable):
@@ -23,8 +27,8 @@ class Config(Serializable):
 	join_tip_delay_seconds: float = 1.5
 	# 是否发送进服 MOTD（开服天数 + 自定义行）
 	motd_enabled: bool = True
-	# 开服日期，格式 YYYY-MM-DD，用于计算开服天数；留空则不显示天数
-	motd_start_day: str = ""
+	# 开服日期，格式 YYYY-MM-DD；默认为配置生成当天（当天算第 1 天）
+	motd_start_day: str = _today()
 	# MOTD 文本行。支持：
 	#   {player} 玩家名
 	#   {days}   开服天数
@@ -36,14 +40,17 @@ class Config(Serializable):
 		"§6欢迎 §e{player}§6 加入服务器！",
 		"§7服务器已开服 §b{days}§7 天",
 		"§7官网: {link:§b点击打开官网|https://www.skymirror.top}",
-		"§7QQ群: §f985402607",
+		"§7QQ群: {link:§f985402607|https://skymirror.top/qq}",
 	]
 
 
 CONFIG_FILE = "config/iridium.json"
 
-# 首次生成时写入带注释的 JSON（MCDR 本身不写注释）
-DEFAULT_CONFIG_TEXT = """{
+
+def build_default_config_text() -> str:
+	"""带注释的默认配置；开服日期为生成当天。"""
+	today = _today()
+	return f"""{{
 	// 使用 !!share / !!hat / !!head / !!c 所需的最低权限等级
 	// 0=控制台  1=普通玩家  2=OP/管理员
 	"permission": 1,
@@ -71,21 +78,25 @@ DEFAULT_CONFIG_TEXT = """{
 	"motd_enabled": true,
 
 	// 开服日期，格式 YYYY-MM-DD（当天算第 1 天）
-	// 留空则不显示开服天数
-	"motd_start_day": "",
+	// 默认为本配置文件生成当天，可自行修改为真实开服日
+	"motd_start_day": "{today}",
 
 	// MOTD 文本行
-	// 占位符: {player} 玩家名  {days} 开服天数  {online} 在线人数
-	// 链接:   {link:显示文字|https://url}  或  {link:https://url}
+	// 占位符: {{player}} 玩家名  {{days}} 开服天数  {{online}} 在线人数
+	// 链接:   {{link:显示文字|https://url}}  或  {{link:https://url}}
 	// 颜色:   支持原版 § 颜色代码
 	"motd_lines": [
-		"§6欢迎 §e{player}§6 加入服务器！",
-		"§7服务器已开服 §b{days}§7 天",
-		"§7官网: {link:§b点击打开官网|https://www.skymirror.top}",
-		"§7QQ群: §f985402607"
+		"§6欢迎 §e{{player}}§6 加入服务器！",
+		"§7服务器已开服 §b{{days}}§7 天",
+		"§7官网: {{link:§b点击打开官网|https://www.skymirror.top}}",
+		"§7QQ群: {{link:§f985402607|https://skymirror.top/qq}}"
 	]
-}
+}}
 """
+
+
+# 兼容旧引用
+DEFAULT_CONFIG_TEXT = build_default_config_text()
 
 # 模块级单例；on_load 时原地更新字段，避免各模块持有过期引用
 config = Config()
@@ -136,22 +147,80 @@ def _strip_json_comments(text: str) -> str:
 	return "".join(out)
 
 
-def _config_path(server: PluginServerInterface) -> Path:
-	wd = Path(server.get_mcdr_config()["working_directory"])
-	return wd / CONFIG_FILE
+def _candidate_paths(server: PluginServerInterface) -> List[Path]:
+	"""Possible config file locations, best first."""
+	paths: List[Path] = []
+	seen = set()
+
+	def add(p: Path) -> None:
+		try:
+			rp = p.expanduser().resolve()
+		except Exception:
+			rp = p
+		key = str(rp)
+		if key not in seen:
+			seen.add(key)
+			paths.append(rp)
+
+	try:
+		wd = server.get_mcdr_config().get("working_directory")
+		if wd:
+			add(Path(wd) / CONFIG_FILE)
+	except Exception:
+		pass
+	try:
+		add(Path.cwd() / CONFIG_FILE)
+	except Exception:
+		pass
+	# Fallback: next to CWD if MCDR launched from elsewhere
+	add(Path.cwd() / "config" / "iridium.json")
+	return paths
+
+
+def config_path(server: PluginServerInterface) -> Path:
+	"""Prefer an existing file; else the first writable candidate."""
+	candidates = _candidate_paths(server)
+	for p in candidates:
+		if p.is_file():
+			return p
+	return candidates[0]
+
+
+def ensure_config_file(server: PluginServerInterface) -> Path:
+	"""Create commented default config if missing. Always returns absolute path."""
+	path = config_path(server)
+	try:
+		path.parent.mkdir(parents=True, exist_ok=True)
+	except Exception as e:
+		server.logger.error(f"无法创建配置目录 {path.parent}: {e}")
+		return path
+	if not path.is_file():
+		try:
+			path.write_text(build_default_config_text(), encoding="utf-8")
+			server.logger.info(f"已生成配置文件: {path}")
+		except Exception as e:
+			server.logger.error(f"写入配置文件失败 {path}: {e}")
+	return path
 
 
 def load_config(server: PluginServerInterface) -> Config:
-	"""Load config/iridium.json; create a commented default on first run."""
-	path = _config_path(server)
-	path.parent.mkdir(parents=True, exist_ok=True)
-	if not path.exists():
-		path.write_text(DEFAULT_CONFIG_TEXT, encoding="utf-8")
-		server.logger.info(f"已生成配置文件: {CONFIG_FILE}")
-	raw = path.read_text(encoding="utf-8")
+	"""Load config; recreate a commented default whenever the file is missing."""
+	path = ensure_config_file(server)
+	if not path.is_file():
+		server.logger.warning(f"配置文件不存在且无法创建，使用内存默认值: {path}")
+		return Config()
+	try:
+		raw = path.read_text(encoding="utf-8")
+	except Exception as e:
+		server.logger.error(f"读取配置失败 {path}: {e}，使用默认值")
+		return Config()
 	try:
 		data = json.loads(_strip_json_comments(raw))
 	except json.JSONDecodeError as e:
-		server.logger.error(f"配置文件 JSON 解析失败，使用默认值: {e}")
+		server.logger.error(f"配置文件 JSON 解析失败 {path}: {e}，使用默认值")
 		return Config()
-	return Config.deserialize(data)
+	try:
+		return Config.deserialize(data)
+	except Exception as e:
+		server.logger.error(f"配置反序列化失败 {path}: {e}，使用默认值")
+		return Config()

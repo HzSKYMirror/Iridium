@@ -1,69 +1,120 @@
-# Changelog
+# Changelog / 更新日志
 
-本文件记录 Iridium 的重要变更。
+本文件记录 Iridium 的重要变更。  
+This file records notable changes to Iridium.
+
+---
+
+## [26.9.14] - 2026-09-14
+
+### 修复 / Fixed
+- 删除 `config/iridium.json` 后重载可正确重新生成（多路径探测 + 写入失败日志）
+- Deleting `config/iridium.json` then reloading correctly recreates the file (multi-path probe + write-failure logs)
+
+### 变更 / Changed
+- `motd_start_day` 默认为配置生成当天（YYYY-MM-DD），不再为空
+- `motd_start_day` defaults to the config creation date (`YYYY-MM-DD`), no longer empty
+- 去掉 MOTD 标题「服务器信息」/「Server Info」
+- Removed the MOTD header title (`服务器信息` / `Server Info`)
+- 默认 QQ 群增加可点击链接 `https://skymirror.top/qq`
+- Default QQ group line is now a clickable link to `https://skymirror.top/qq`
+- 进服命令提示文案去掉「已启用 Iridium」
+- Join tip header no longer says “Iridium is enabled”
+
+### 新增 / Added
+- 英文文档 `README_en.md`
+- English documentation `README_en.md`
+
+---
 
 ## [26.9.13] - 2026-09-13
 
-### Added
+### 新增 / Added
 - 首次启动自动生成带中文注释的 `config/iridium.json`
+- On first load, generate a commented `config/iridium.json`
 - 配置文件支持 `//` 行注释
+- Config file supports `//` line comments
 
-### Changed
+### 变更 / Changed
 - 提交信息改为中文
+- Commit messages rewritten in Chinese
 - 清理历史 Release，仅保留当前版本
+- Cleaned old Releases; keep only the current version
+
+---
 
 ## [26.9.8] - 2026-09-13
 
-### Changed
-- `!!share`：去掉「点击复制完整数据」，仅保留物品名 + 悬停预览（与 ShowIt 风格一致）
+### 变更 / Changed
+- `!!share`：去掉「点击复制完整数据」，仅保留物品名 + 悬停预览
+- `!!share`: removed the copy-to-clipboard button; name + hover only
+
+---
 
 ## [26.9.7] - 2026-09-13
 
-### Fixed
-- `!!share`：无 NBT 改名时，正文 fallback 改为 ID 美化名（如 `Time Twister Wireless`），不再直接显示 `kubejs:...`；语言键命中则显示正式本地化名
+### 修复 / Fixed
+- `!!share`：无 NBT 改名时 fallback 为 ID 美化名（如 `Time Twister Wireless`）
+- `!!share`: humanized ID fallback when the item has no NBT custom name
+
+---
 
 ## [26.9.6] - 2026-09-13
 
-### Fixed
-- `!!share`：默认物品名改为客户端 `translate` 组件（如 `block.ae2.fluix_covered_cable`），本地化显示正式名；仅有 NBT 自定义名时仍显示改名
-- `!!share`：提示音在玩家位置播放，避免 "sound is too far away"
+### 修复 / Fixed
+- `!!share`：使用客户端 `translate` 组件显示本地化名
+- `!!share`: use client `translate` component for localized names
+- `!!share`：提示音在玩家位置播放
+- `!!share`: play sound at the player to avoid “too far away”
+
+---
 
 ## [26.9.5] - 2026-09-13
 
-### Fixed
-- `!!hat`（1.17+）：改用副手缓冲做真正交换，避免复杂 NBT 重建失败导致原头盔消失；副手非空时拒绝并提示
-- `!!share`：展示名优先取 `custom_name` / `display.Name` / translate，不再只显示物品 ID
+### 修复 / Fixed
+- `!!hat`（1.17+）：副手缓冲交换，避免复杂 NBT 重建失败导致物品消失
+- `!!hat` (1.17+): offhand-buffer swap so complex NBT cannot wipe items
+- `!!share`：优先显示自定义名 / translate
+- `!!share`: prefer custom name / translate over raw item id
+
+---
 
 ## [26.9.4] - 2026-09-13
 
-### Added
-- 操作日志：`!!share` / `!!hat` / `!!head` / `!!c` 成功时写入 MCDR 控制台（`[Iridium] ...`）
+### 新增 / Added
+- 操作日志写入 MCDR 控制台
+- Command operations logged to the MCDR console
+
+---
 
 ## [26.9.3] - 2026-09-13
 
-### Fixed
-- `!!share` / `!!hat` / `!!head`：`info.version` 若为字符串时比较崩溃（`Cannot compare Version and str`）
-- `!!c`：命令回调少绑定 `server` 导致 `do_calc() missing ... context`
+### 修复 / Fixed
+- 版本比较在 `str` / `Version` 之间崩溃
+- Version comparison crash between `str` and `Version`
+- `!!c` 回调缺少 `server` 绑定
+- `!!c` callback missing `server` binding
+
+---
 
 ## [26.9.2] - 2026-09-13
 
-### Fixed
-- 语言文件 YAML 解析失败（值中含 `:` 未加引号导致 `mapping values are not allowed`）
-- 进服事件名错误：`PLAYER_JOIN` → `PLAYER_JOINED`（否则插件 on_load 失败）
+### 修复 / Fixed
+- 语言文件 YAML 因值中冒号未加引号而解析失败
+- Language YAML failed when values contained unquoted colons
+- 进服事件名：`PLAYER_JOIN` → `PLAYER_JOINED`
+- Join event name: `PLAYER_JOIN` → `PLAYER_JOINED`
+
+---
 
 ## [26.9.1] - 2026-09-13
 
-### Added
-- `!!share`：展示主手物品（悬停完整数据，1.16+ 点击复制，可选提示音）
-- `!!hat`：主手物品与头部装备互换（需 RCON）
-- `!!head [player]`：获取一个玩家头颅，支持冷却与权限
-- `!!c <expression>`：游戏内四则运算计算器（AST 白名单，零依赖）
-- 进服 MOTD：开服天数、自定义文案、可点击链接、`§` 颜色
-- 进服命令提示（可点击填入聊天框）
-- 按 Minecraft 版本分支；不支持的功能会明确提示
+### 新增 / Added
+- `!!share` / `!!hat` / `!!head` / `!!c`、进服 MOTD 与命令提示
+- `!!share` / `!!hat` / `!!head` / `!!c`, join MOTD and command tips
+- 按 Minecraft 版本分支；不支持的功能会提示
+- Minecraft-version branching with clear prompts when unsupported
 
-### Security
-- 玩家名统一清洗为 `[A-Za-z0-9_]` 并限长后再拼进 `/give`、`data get`、`item replace`
-- 控制台命令去除换行，防止拆成多行二次执行
-- tellraw 对物品 SNBT 做 JSON 转义与长度截断
-- MOTD 链接仅允许 `http://` / `https://`
+### 安全 / Security
+- 玩家名清洗、命令去换行、tellraw 转义、链接仅 http(s)
+- Name sanitization, newline stripping, tellraw escaping, http(s)-only links

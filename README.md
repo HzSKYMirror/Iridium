@@ -4,7 +4,7 @@ MCDReforged 插件：物品展示 / 戴头 / 获取头颅 / 游戏内计算器 /
 
 | | |
 |---|---|
-| 版本 | **26.9.13** |
+| 版本 | **26.9.14** |
 | 作者 | 云镜之端/SKYMirror |
 | 许可 | 保留所有权益（All Rights Reserved） |
 | 前置 | MCDReforged `>= 2.6.0` |
@@ -91,12 +91,12 @@ rcon.password=your_password
 	"join_tip": true,
 	"join_tip_delay_seconds": 1.5,
 	"motd_enabled": true,
-	"motd_start_day": "",
+	"motd_start_day": "2026-09-14",
 	"motd_lines": [
 		"§6欢迎 §e{player}§6 加入服务器！",
 		"§7服务器已开服 §b{days}§7 天",
 		"§7官网: {link:§b点击打开官网|https://www.skymirror.top}",
-		"§7QQ群: §f985402607"
+		"§7QQ群: {link:§f985402607|https://skymirror.top/qq}"
 	]
 }
 ```
@@ -111,7 +111,7 @@ rcon.password=your_password
 | `join_tip` | `true` | 进服是否提示可用命令 |
 | `join_tip_delay_seconds` | `1.5` | 进服消息延迟；`0` 立即 |
 | `motd_enabled` | `true` | 是否发送 MOTD |
-| `motd_start_day` | `""` | 开服日期 `YYYY-MM-DD`（当天算第 1 天）；留空不显示天数 |
+| `motd_start_day` | 生成配置当天 | 开服日期 `YYYY-MM-DD`（当天算第 1 天）；可改成真实开服日 |
 | `motd_lines` | 见上 | MOTD 文本行 |
 
 修改配置后执行 `!!MCDR reload plugin` 生效。

@@ -175,11 +175,10 @@ def build_motd(player: str, server: ServerInterface) -> Optional[RTextList]:
 	lines = list(config.motd_lines or [])
 	if not lines:
 		return None
-	parts: List[RText] = [
-		RText(tr("motd_header"), RColor.gold, styles=[RStyle.bold])
-	]
-	for line in lines:
-		parts.append(RText("\n"))
+	parts: List[RText] = []
+	for i, line in enumerate(lines):
+		if i:
+			parts.append(RText("\n"))
 		parts.extend(render_motd_line(line, player, server))
 	# Only auto-append the day footer when no line already uses {days}/{day}
 	days = server_days()

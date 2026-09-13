@@ -269,12 +269,15 @@ def test_extract_display_name():
 
 def test_strip_json_comments():
 	import json
+	from datetime import date
 
-	from iridium.config import DEFAULT_CONFIG_TEXT, _strip_json_comments
+	from iridium.config import build_default_config_text, _strip_json_comments
 
-	parsed = json.loads(_strip_json_comments(DEFAULT_CONFIG_TEXT))
+	text = build_default_config_text()
+	parsed = json.loads(_strip_json_comments(text))
 	assert parsed["permission"] == 1
 	assert "skymirror.top" in parsed["motd_lines"][2]
+	assert parsed["motd_start_day"] == date.today().strftime("%Y-%m-%d")
 	# comment-looking text inside string is kept
 	assert json.loads(_strip_json_comments('{"a": "http://x"}'))["a"] == "http://x"
 
