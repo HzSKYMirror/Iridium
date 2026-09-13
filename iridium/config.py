@@ -47,10 +47,6 @@ class Config(Serializable):
 
 # 当前配置：MCDR 数据目录 → config/iridium/iridium.yml
 CONFIG_FILE_NAME = "iridium.yml"
-# 历史路径（仅用于迁移）
-LEGACY_JSON_NAMES = (
-	"iridium.json",  # config/iridium/iridium.json
-)
 
 
 def build_default_config_text() -> str:
@@ -101,8 +97,6 @@ motd_lines:
   - "§7QQ群: {{link:§f985402607|https://skymirror.top/qq}}"
 """
 
-
-DEFAULT_CONFIG_TEXT = build_default_config_text()
 
 # 模块级单例；on_load 时原地更新字段，避免各模块持有过期引用
 config = Config()

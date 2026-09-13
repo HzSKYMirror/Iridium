@@ -5,6 +5,14 @@ This file records notable changes to Iridium.
 
 ---
 
+## [26.9.17] - 2026-09-14
+
+### 清理 / Cleanup
+- 移除未使用的常量、翻译键与导入
+- Removed unused constants, translation keys, and imports
+
+---
+
 ## [26.9.16] - 2026-09-14
 
 ### 变更 / Changed

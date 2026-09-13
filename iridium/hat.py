@@ -260,7 +260,6 @@ def _extract_item_payload(payload: str, version: Version) -> Optional[str]:
 def _do_swap(server: PluginServerInterface, src: CommandSource, player: str, version: Version) -> bool:
 	name = sanitize_name(player)
 	head_slot = _head_slot(version)
-	hand_slot = _hand_slot(version, 0)
 
 	# 1.17+: true swap via offhand buffer — no need to rebuild item NBT
 	if is_at_least(version, "1.17"):

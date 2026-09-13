@@ -10,7 +10,7 @@ import iridium.hat as hat
 import iridium.head as head
 import iridium.join_tip as join_tip
 import iridium.share as share
-from iridium.config import Config, apply_config, load_config
+from iridium.config import apply_config, load_config
 from iridium.version_util import tr
 
 

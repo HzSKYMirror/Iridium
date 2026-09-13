@@ -6,8 +6,6 @@ from iridium.config import config
 
 # Fallback strings when ServerInterface is unavailable (unit tests / early import)
 _FALLBACK = {
-	"click_copy": "click to copy data",
-	"click_suggest": "click for data command",
 	"calc_usage": "Usage: !!c <expression>",
 	"share_showing": "is showing",
 }
