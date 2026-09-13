@@ -5,6 +5,18 @@ This file records notable changes to Iridium.
 
 ---
 
+## [26.9.15] - 2026-09-14
+
+### 修复 / Fixed
+- 配置文件写到错误路径导致「删掉后重载不生成」：改用 MCDR 数据目录 `config/iridium/iridium.json`（`get_data_folder`）
+- Config written to the wrong path so delete+reload did not recreate it; now uses MCDR data folder `config/iridium/iridium.json`
+
+### 变更 / Changed
+- 文档中的配置路径更新为 `config/iridium/iridium.json`
+- Docs updated to the correct config path
+
+---
+
 ## [26.9.14] - 2026-09-14
 
 ### 修复 / Fixed

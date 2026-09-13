@@ -4,7 +4,7 @@ MCDReforged plugin: item share / wear on head / player head / calculator / join 
 
 | | |
 |---|---|
-| Version | **26.9.14** |
+| Version | **26.9.15** |
 | Author | 云镜之端/SKYMirror |
 | License | All Rights Reserved |
 | Requires | MCDReforged `>= 2.6.0` |
@@ -48,7 +48,7 @@ rcon.password=your_password
 
 ## Config
 
-Path: `config/iridium.json` (auto-created with comments on first load)
+Path: `config/iridium/iridium.json` (auto-created on first load; migrates legacy `config/iridium.json` if present)
 
 | Field | Default | Description |
 |------|---------|-------------|

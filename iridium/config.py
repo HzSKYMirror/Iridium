@@ -1,4 +1,5 @@
 import json
+import shutil
 from datetime import date
 from pathlib import Path
 from typing import List, Optional
@@ -29,13 +30,7 @@ class Config(Serializable):
 	motd_enabled: bool = True
 	# 开服日期，格式 YYYY-MM-DD；默认为配置生成当天（当天算第 1 天）
 	motd_start_day: str = _today()
-	# MOTD 文本行。支持：
-	#   {player} 玩家名
-	#   {days}   开服天数
-	#   {online} 在线人数（拿不到时显示 ?）
-	#   {link:显示文字|https://url}  可点击链接
-	#   {link:https://url}           链接，显示为完整 URL
-	#   § 颜色代码
+	# MOTD 文本行
 	motd_lines: List[str] = [
 		"§6欢迎 §e{player}§6 加入服务器！",
 		"§7服务器已开服 §b{days}§7 天",
@@ -44,7 +39,10 @@ class Config(Serializable):
 	]
 
 
-CONFIG_FILE = "config/iridium.json"
+# MCDR data folder: config/<plugin_id>/iridium.json
+CONFIG_FILE_NAME = "iridium.json"
+# 旧路径（仅用于迁移）
+LEGACY_CONFIG_FILE = "config/iridium.json"
 
 
 def build_default_config_text() -> str:
@@ -95,7 +93,6 @@ def build_default_config_text() -> str:
 """
 
 
-# 兼容旧引用
 DEFAULT_CONFIG_TEXT = build_default_config_text()
 
 # 模块级单例；on_load 时原地更新字段，避免各模块持有过期引用
@@ -147,80 +144,73 @@ def _strip_json_comments(text: str) -> str:
 	return "".join(out)
 
 
-def _candidate_paths(server: PluginServerInterface) -> List[Path]:
-	"""Possible config file locations, best first."""
-	paths: List[Path] = []
-	seen = set()
+def config_file_path(server: PluginServerInterface) -> Path:
+	"""Canonical path: MCDR data folder → config/iridium/iridium.json"""
+	return Path(server.get_data_folder()) / CONFIG_FILE_NAME
 
-	def add(p: Path) -> None:
-		try:
-			rp = p.expanduser().resolve()
-		except Exception:
-			rp = p
-		key = str(rp)
-		if key not in seen:
-			seen.add(key)
-			paths.append(rp)
 
+def _legacy_path(server: PluginServerInterface) -> Path:
 	try:
-		wd = server.get_mcdr_config().get("working_directory")
-		if wd:
-			add(Path(wd) / CONFIG_FILE)
+		wd = server.get_mcdr_config().get("working_directory") or "."
+		return (Path(wd) / LEGACY_CONFIG_FILE).expanduser().resolve()
 	except Exception:
-		pass
-	try:
-		add(Path.cwd() / CONFIG_FILE)
-	except Exception:
-		pass
-	# Fallback: next to CWD if MCDR launched from elsewhere
-	add(Path.cwd() / "config" / "iridium.json")
-	return paths
+		return Path.cwd() / LEGACY_CONFIG_FILE
 
 
-def config_path(server: PluginServerInterface) -> Path:
-	"""Prefer an existing file; else the first writable candidate."""
-	candidates = _candidate_paths(server)
-	for p in candidates:
-		if p.is_file():
-			return p
-	return candidates[0]
-
-
-def ensure_config_file(server: PluginServerInterface) -> Path:
-	"""Create commented default config if missing. Always returns absolute path."""
-	path = config_path(server)
+def _write_commented_default(path: Path, server: PluginServerInterface) -> bool:
 	try:
 		path.parent.mkdir(parents=True, exist_ok=True)
+		path.write_text(build_default_config_text(), encoding="utf-8")
+		server.logger.info(f"已生成配置文件: {path}")
+		return True
 	except Exception as e:
-		server.logger.error(f"无法创建配置目录 {path.parent}: {e}")
-		return path
-	if not path.is_file():
-		try:
-			path.write_text(build_default_config_text(), encoding="utf-8")
-			server.logger.info(f"已生成配置文件: {path}")
-		except Exception as e:
-			server.logger.error(f"写入配置文件失败 {path}: {e}")
-	return path
+		server.logger.error(f"写入配置文件失败 {path}: {e}")
+		return False
+
+
+def _migrate_legacy(server: PluginServerInterface, dest: Path) -> None:
+	"""If old config/iridium.json exists, copy it to the data folder path."""
+	src = _legacy_path(server)
+	try:
+		if src.is_file() and src.resolve() != dest.resolve() and not dest.is_file():
+			dest.parent.mkdir(parents=True, exist_ok=True)
+			shutil.copy2(src, dest)
+			server.logger.info(f"已从旧路径迁移配置: {src} -> {dest}")
+	except Exception as e:
+		server.logger.warning(f"迁移旧配置失败 {src}: {e}")
 
 
 def load_config(server: PluginServerInterface) -> Config:
-	"""Load config; recreate a commented default whenever the file is missing."""
-	path = ensure_config_file(server)
+	"""
+	Load config using MCDR's official data folder (config/iridium/iridium.json).
+	1. Prefer that path; create commented default if missing
+	2. Migrate legacy config/iridium.json if present
+	3. Fallback: load_config_simple
+	"""
+	path = config_file_path(server)
+	_migrate_legacy(server, path)
+
 	if not path.is_file():
-		server.logger.warning(f"配置文件不存在且无法创建，使用内存默认值: {path}")
-		return Config()
+		_write_commented_default(path, server)
+
+	if path.is_file():
+		try:
+			raw = path.read_text(encoding="utf-8")
+			data = json.loads(_strip_json_comments(raw))
+			server.logger.info(f"配置已加载: {path}")
+			return Config.deserialize(data)
+		except Exception as e:
+			server.logger.error(f"读取/解析配置失败 {path}: {e}，尝试 load_config_simple")
+
+	# Official MCDR loader as last resort
 	try:
-		raw = path.read_text(encoding="utf-8")
+		cfg = server.load_config_simple(
+			CONFIG_FILE_NAME,
+			target_class=Config,
+			in_data_folder=True,
+		)
+		server.logger.info(f"配置已通过 load_config_simple 加载: {path}")
+		return cfg
 	except Exception as e:
-		server.logger.error(f"读取配置失败 {path}: {e}，使用默认值")
-		return Config()
-	try:
-		data = json.loads(_strip_json_comments(raw))
-	except json.JSONDecodeError as e:
-		server.logger.error(f"配置文件 JSON 解析失败 {path}: {e}，使用默认值")
-		return Config()
-	try:
-		return Config.deserialize(data)
-	except Exception as e:
-		server.logger.error(f"配置反序列化失败 {path}: {e}，使用默认值")
+		server.logger.error(f"load_config_simple 失败: {e}，使用内存默认值")
 		return Config()

@@ -4,7 +4,7 @@ MCDReforged 插件：物品展示 / 戴头 / 获取头颅 / 游戏内计算器 /
 
 | | |
 |---|---|
-| 版本 | **26.9.14** |
+| 版本 | **26.9.15** |
 | 作者 | 云镜之端/SKYMirror |
 | 许可 | 保留所有权益（All Rights Reserved） |
 | 前置 | MCDReforged `>= 2.6.0` |
@@ -79,7 +79,7 @@ rcon.password=your_password
 
 ## 配置
 
-路径：`config/iridium.json`（首次加载自动生成）
+路径：`config/iridium/iridium.json`（首次加载自动生成；若存在旧文件 `config/iridium.json` 会自动迁移）
 
 ```json
 {
