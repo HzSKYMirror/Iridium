@@ -5,55 +5,33 @@ This file records notable changes to Iridium.
 
 ---
 
-## [26.9.17] - 2026-09-14
-
-### 清理 / Cleanup
-- 移除未使用的常量、翻译键与导入
-- Removed unused constants, translation keys, and imports
-
----
-
-## [26.9.16] - 2026-09-14
-
-### 变更 / Changed
-- 配置格式改为 **YAML**：`config/iridium/iridium.yml`（`#` 原生注释）
-- Config format is now **YAML**: `config/iridium/iridium.yml` (native `#` comments)
-- 自动从旧 JSON（`config/iridium.json` 或 `config/iridium/iridium.json`）迁移
-- Auto-migrates from legacy JSON configs
-
----
-
-## [26.9.15] - 2026-09-14
-
-### 修复 / Fixed
-- 配置文件写到错误路径导致「删掉后重载不生成」：改用 MCDR 数据目录 `config/iridium/iridium.json`（`get_data_folder`）
-- Config written to the wrong path so delete+reload did not recreate it; now uses MCDR data folder `config/iridium/iridium.json`
-
-### 变更 / Changed
-- 文档中的配置路径更新为 `config/iridium/iridium.json`
-- Docs updated to the correct config path
-
----
-
 ## [26.9.14] - 2026-09-14
 
 ### 修复 / Fixed
-- 删除 `config/iridium.json` 后重载可正确重新生成（多路径探测 + 写入失败日志）
-- Deleting `config/iridium.json` then reloading correctly recreates the file (multi-path probe + write-failure logs)
+- 删除配置后重载可正确重新生成；配置写入 MCDR 数据目录
+- Deleting config then reloading correctly recreates it; config stored under the MCDR data folder
 
 ### 变更 / Changed
-- `motd_start_day` 默认为配置生成当天（YYYY-MM-DD），不再为空
-- `motd_start_day` defaults to the config creation date (`YYYY-MM-DD`), no longer empty
+- 配置格式为 **YAML**：`config/iridium/iridium.yml`（`#` 原生注释）
+- Config format is **YAML**: `config/iridium/iridium.yml` (native `#` comments)
+- 自动从旧 JSON（`config/iridium.json` 或 `config/iridium/iridium.json`）迁移
+- Auto-migrates from legacy JSON configs
+- `motd_start_day` 默认为配置生成当天（YYYY-MM-DD）
+- `motd_start_day` defaults to the config creation date
 - 去掉 MOTD 标题「服务器信息」/「Server Info」
-- Removed the MOTD header title (`服务器信息` / `Server Info`)
-- 默认 QQ 群增加可点击链接 `https://skymirror.top/qq`
-- Default QQ group line is now a clickable link to `https://skymirror.top/qq`
+- Removed the MOTD header title
+- 默认 QQ 群可点击链接 `https://skymirror.top/qq`
+- Default QQ group is a clickable link to `https://skymirror.top/qq`
 - 进服命令提示文案去掉「已启用 Iridium」
 - Join tip header no longer says “Iridium is enabled”
 
 ### 新增 / Added
 - 英文文档 `README_en.md`
 - English documentation `README_en.md`
+
+### 清理 / Cleanup
+- 移除未使用的常量、翻译键与导入
+- Removed unused constants, translation keys, and imports
 
 ---
 

@@ -3,7 +3,7 @@
 - ID: `iridium`
 - Name: Iridium
 - Repository: https://github.com/HzSKYMirror/Iridium
-- Release: https://github.com/HzSKYMirror/Iridium/releases/tag/v26.9.17
+- Release: https://github.com/HzSKYMirror/Iridium/releases/tag/v26.9.14
 - Labels: `tool`
 
 ## Summary

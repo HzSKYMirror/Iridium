@@ -4,7 +4,7 @@ MCDReforged plugin: item share / wear on head / player head / calculator / join 
 
 | | |
 |---|---|
-| Version | **26.9.17** |
+| Version | **26.9.14** |
 | Author | 云镜之端/SKYMirror |
 | License | All Rights Reserved |
 | Requires | MCDReforged `>= 2.6.0` |
