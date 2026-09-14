@@ -6,7 +6,7 @@ MCDReforged plugin: item share / wear on head / player head / calculator / join 
 |---|---|
 | Version | **26.9.14** |
 | Author | 云镜之端/SKYMirror |
-| License | All Rights Reserved |
+| License | **GPL-3.0** |
 | Requires | MCDReforged `>= 2.6.0` |
 | Minecraft | **1.7.10+** (feature-gated by version) |
 | Python deps | None |
@@ -92,4 +92,6 @@ Default `motd_lines` (QQ group is clickable):
 
 ## Copyright
 
-Copyright (c) 2026 云镜之端/SKYMirror. All Rights Reserved. See `LICENSE`.
+Copyright (c) 2026 云镜之端/SKYMirror.
+
+This project is licensed under the **GNU GPL v3.0**. See `LICENSE`.

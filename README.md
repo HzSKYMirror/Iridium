@@ -6,7 +6,7 @@ MCDReforged 插件：物品展示 / 戴头 / 获取头颅 / 游戏内计算器 /
 |---|---|
 | 版本 | **26.9.14** |
 | 作者 | 云镜之端/SKYMirror |
-| 许可 | 保留所有权益（All Rights Reserved） |
+| 许可 | **GPL-3.0** |
 | 前置 | MCDReforged `>= 2.6.0` |
 | MC | **1.7.10+**（按版本分支；不支持的功能会提示） |
 | 依赖 | 无第三方 Python 包 |
@@ -161,6 +161,7 @@ python3 tests/test_pure.py
 
 ## 版权
 
-Copyright (c) 2026 云镜之端/SKYMirror. All Rights Reserved.
+Copyright (c) 2026 云镜之端/SKYMirror.
 
-未经书面许可，不得复制、修改、分发或用于商业用途。详见 [LICENSE](LICENSE)。
+本项目采用 **GNU GPL v3.0** 许可，详见 [LICENSE](LICENSE)。  
+This project is licensed under the **GNU GPL v3.0**. See [LICENSE](LICENSE).

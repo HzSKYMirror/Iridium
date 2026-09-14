@@ -12,6 +12,8 @@ This file records notable changes to Iridium.
 - Deleting config then reloading correctly recreates it; config stored under the MCDR data folder
 
 ### 变更 / Changed
+- 许可证改为 **GPL-3.0**（原先为保留所有权益）
+- License changed to **GPL-3.0** (was All Rights Reserved)
 - 配置格式为 **YAML**：`config/iridium/iridium.yml`（`#` 原生注释）
 - Config format is **YAML**: `config/iridium/iridium.yml` (native `#` comments)
 - 自动从旧 JSON（`config/iridium.json` 或 `config/iridium/iridium.json`）迁移

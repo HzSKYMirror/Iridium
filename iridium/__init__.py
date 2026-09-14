@@ -1,6 +1,7 @@
 """Iridium — item share / hat / head / calculator for MCDReforged.
 
-Copyright (c) 2026 云镜之端/SKYMirror. All Rights Reserved.
+Copyright (c) 2026 云镜之端/SKYMirror.
+SPDX-License-Identifier: GPL-3.0-only
 """
 
 from mcdreforged.api.all import *
